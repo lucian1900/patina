@@ -1,9 +1,10 @@
-from ply import lex as plylex
+import ply.lex
+from ply.lex import TOKEN
 
 
 class Lexer(object):
     def build(self, *args, **kwargs):
-        self.lexer = plylex.lex(object=self, *args, **kwargs)
+        self.lexer = ply.lex.lex(object=self, *args, **kwargs)
 
     def input(self, text):
         self.lexer.input(text)
@@ -11,35 +12,54 @@ class Lexer(object):
     def __iter__(self):
         return iter(self.lexer)
 
-    # keywords = (
-    #     'STRUCT',
-    #     'FN',
-    #     'LET',
-    # )
+    digit            = r'([0-9])'
+    nondigit         = r'([_A-Za-z])'
+    identifier       = r'(' + nondigit + r'(' + digit + r'|' + nondigit + r')*)'
+
+    keywords = {
+        'struct': 'STRUCT',
+        'fn': 'FN',
+        'let': 'LET',
+        'if': 'IF',
+    }
 
     # List of token names.   This is always required
-    tokens = (
+    tokens = [
         'ID',
 
         'NUMBER', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
 
-        #'EQUALS',
+        'ASSIGN', 'EQUALS', 'RETURNS',
 
         'LPAREN', 'RPAREN',
-        #'LBRACKET', 'RBRACKET',
-        #'LBRACE', 'RBRACE',
+        'LBRACKET', 'RBRACKET',
+        'LBRACE', 'RBRACE',
 
-        #'COMMA', 'SEMI', 'COLON',
-    )
+        'COMMA', 'SEMI', 'COLON',
+
+
+    ] + list(keywords.values())
 
     # Regular expression rules for simple tokens
-    t_PLUS    = r'\+'
-    t_MINUS   = r'-'
-    t_TIMES   = r'\*'
-    t_DIVIDE  = r'/'
-    t_LPAREN  = r'\('
-    t_RPAREN  = r'\)'
+    t_PLUS     = r'\+'
+    t_MINUS    = r'-'
+    t_TIMES    = r'\*'
+    t_DIVIDE   = r'/'
+    t_LPAREN   = r'\('
+    t_RPAREN   = r'\)'
+    t_LBRACKET = r'\['
+    t_RBRACKET = r'\]'
+    t_LBRACE   = r'\{'
+    t_RBRACE   = r'\}'
+    t_RETURNS  = r'->'
+    t_EQUALS   = r'=='
+    t_COLON    = r':'
 
+    @TOKEN(identifier)
+    def t_ID(self, t):
+        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        t.type = self.keywords.get(t.value, 'ID')
+        return t
 
     # A regular expression rule with some action code
     def t_NUMBER(self, t):
@@ -53,9 +73,9 @@ class Lexer(object):
         r'\n+'
         t.lexer.lineno += len(t.value)
 
-
     # A string containing ignored characters (spaces and tabs)
     t_ignore  = ' \t'
+    t_ignore_COMMENT = r'\#.*'
 
 
     # Error handling rule
