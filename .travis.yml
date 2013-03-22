@@ -4,6 +4,9 @@ python:
     - "2.7"
     - "pypy"
     - "3.3"
+matrix:
+    allow_failures:
+        - python: "3.3"
 
 install:
     - pip install pytest
