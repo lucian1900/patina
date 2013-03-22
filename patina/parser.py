@@ -18,6 +18,17 @@ def main(p):
     return p[0]
 
 
+@pg.production('expr : ID')
+def identifier(p):
+    pass
+
+
+# Literals
+@pg.production('expr : NUMBER')
+def literal(p):
+    return Number(p[0].getstr())
+
+
 @pg.production('expr : LPAREN expr RPAREN')
 @pg.production('expr : LBRACKET expr RBRACKET')
 @pg.production('expr : LBRACE expr RBRACE')
@@ -25,21 +36,22 @@ def group(p):
     return p[1]
 
 
+# Operators
+@pg.production('expr : expr EQUALS expr')
 @pg.production('expr : expr PLUS expr')
 @pg.production('expr : expr MINUS expr')
-@pg.production('expr : expr EQUALS expr')
 def binop(p):
-    return (p[0], [2])
+    binop_map = {
+        'PLUS': Plus,
+        'MINUS': Minus,
+        'EQUALS': Equals,
+    }
+    token_type = p[1].gettokentype()
+    return binop_map[token_type](p[0], p[2])
 
 
-@pg.production('expr : NUMBER')
-def literal(p):
-    return Number(p[0].getstr())
-
-
-@pg.production('expr : ID')
-def identifier(p):
-    pass
+def minus(p):
+    return Minus(p[0], p[2])
 
 
 parser = pg.build()
