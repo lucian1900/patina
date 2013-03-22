@@ -1,6 +1,3 @@
 *.pyc
+*.pyo
 *.egg-info
-*.sublime-*
-
-parser.out
-parsetab.py

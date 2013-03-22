@@ -6,13 +6,24 @@ def values(tokens):
     return [t.value for t in tokens]
 
 
-def test_arithmetic():
-    assert values(lex('(1 + 2)')) == ['(', 1, '+', 2, ')']
+def test_simple():
+    assert values(lex('(1 + 2)')) == ['(', '1', '+', '2', ')']
+    assert values(lex('1 == 2')) == ['1', '==', '2']
 
 
 def test_fn():
-    assert values(lex('fn hello(a: int) -> { a == 1 }')) == [
-        'fn', 'hello', '(', 'a', ':', 'int', ')', '->', '{', 'a', '==', 1, '}'
+    assert values(lex('fn hello() {}')) == [
+        'fn', 'hello', '(', ')', '{', '}',
+    ]
+    assert values(lex('fn hello(a: int) {}')) == [
+        'fn', 'hello', '(', 'a', ':', 'int', ')', '{', '}',
+    ]
+    assert values(lex('fn hello() -> int {}')) == [
+        'fn', 'hello', '(', ')', '->', 'int', '{', '}',
+    ]
+    assert values(lex('fn hello(a: int) -> int { a == 1 }')) == [
+        'fn', 'hello', '(', 'a', ':', 'int', ')', '->', 'int',
+        '{', 'a', '==', '1', '}',
     ]
 
 
