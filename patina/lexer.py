@@ -4,15 +4,12 @@ lg = LexerGenerator()
 # Identifiers
 lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
 
+# Literals
+lg.add('NUMBER',   r'\d+')
+
 # Types
 lg.add('RETURNS',  r'->')
 lg.add('COLON',    r':')
-
-# Operators
-lg.add('PLUS',     r'\+')
-lg.add('MINUS',    r'-')
-lg.add('NUMBER',   r'\d+')
-lg.add('EQUALS',   r'==')
 
 # Grouping
 lg.add('LPAREN',   r'\(')
@@ -29,6 +26,10 @@ lg.add('FN',       r'fn')
 lg.add('LET',      r'let')
 lg.add('IF',       r'if')
 
+# Operators
+lg.add('PLUS',     r'\+')
+lg.add('MINUS',    r'-')
+lg.add('EQUALS',   r'==')
 
 lg.ignore(r' ')
 lg.ignore(r'\t')

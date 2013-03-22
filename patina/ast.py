@@ -2,6 +2,11 @@ class Node(object):
     pass
 
 
+class Number(Node):
+    def __init__(self, value):
+        self.value = int(value)
+
+
 class Expr(Node):
     def __init__(self, value):
         self.value = value
