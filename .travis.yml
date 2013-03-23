@@ -1,9 +1,9 @@
 language: python
 python:
-    - "2.6"
     - "2.7"
     - "pypy"
     - "3.3"
+
 matrix:
     allow_failures:
         - python: "3.3"
@@ -11,7 +11,7 @@ matrix:
 install:
     - pip install pytest
 
-script: PYTHONPATH="." py.test
+script: PYTHONPATH="$PYTHNOPATH:." py.test
 
 notifications:
     email: false
