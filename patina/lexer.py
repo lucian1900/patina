@@ -11,6 +11,8 @@ lg.add('NUMBER',   r'\d+')
 lg.add('RETURNS',  r'->')
 lg.add('COLON',    r':')
 
+lg.add('SEMI',     r';')
+
 # Grouping
 lg.add('LPAREN',   r'\(')
 lg.add('RPAREN',   r'\)')

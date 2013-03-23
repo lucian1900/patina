@@ -1,3 +1,5 @@
+from functools import wraps
+
 from rply import ParserGenerator
 
 from patina.lexer import lexer
@@ -9,6 +11,12 @@ pg = ParserGenerator(
     precedence=[],
     cache_id='patina',
 )
+
+
+def applied(f):
+    @wraps(f)
+    def wrapper(args):
+        return f(*args)
 
 
 @pg.production('main : expr')
@@ -23,23 +31,22 @@ def identifier(p):
     return Id(p[0].getstr())
 
 
-# Literals
-@pg.production('expr : NUMBER')
-def literal(p):
-    return Number(p[0].getstr())
+@pg.production('stmt : expr SEMI')
+def stmt(p):
+    expr, _ = p
+    return Statement(expr)
 
 
-@pg.production('expr : LPAREN expr RPAREN')
-@pg.production('expr : LBRACKET expr RBRACKET')
-def group(p):
-    left, expr, right = p
-    return expr
-
-
-@pg.production('expr : LBRACE expr RBRACE')
+@pg.production('expr : LBRACE stmt expr RBRACE')
 def block(p):
     _, exprs, _ = p
     return Block(exprs)
+
+
+@pg.production('expr : LPAREN expr RPAREN')
+def group(p):
+    _, expr, _ = p
+    return Group(expr)
 
 
 @pg.production('expr : LET ID COLON ID ASSIGN expr')
@@ -52,6 +59,18 @@ def let(p):
 def if_(p):
     _, condition, _, then, _, _, _, otherwise, _ = p
     return If(condition, then, otherwise)
+
+
+# Literals
+@pg.production('expr : NUMBER')
+def literal(p):
+    return Number(p[0].getstr())
+
+
+@pg.production('expr : LBRACKET expr RBRACKET')
+def array(p):
+    _, expr, _ = p
+    return Array(expr)
 
 
 # Operators

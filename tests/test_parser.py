@@ -6,6 +6,9 @@ def test_simple():
     assert parse('1') == Number(1)
     assert parse('1 + 2') == Plus(Number(1), Number(2))
     assert parse('hello') == Id('hello')
+
+
+def test_block():
     assert parse('{ 1 }') == Block(Number(1))
 
 

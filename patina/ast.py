@@ -12,14 +12,17 @@ class Expr(Node):
         self.value = value
 
 
+class Group(Expr):
+    pass
+
+
+class Statement(Expr):
+    pass
+
+
 class Block(Node):
     def __init__(self, exprs):
         self.exprs = exprs
-
-
-class Literal(Expr):
-    def __init__(self, value):
-        self.value = value
 
 
 class Id(Expr):
@@ -28,12 +31,21 @@ class Id(Expr):
     #    return self.value == other.value
 
 
+class Literal(Expr):
+    def __init__(self, value):
+        self.value = value
+
+
 class Number(Literal):
     def __init__(self, value):
         super(Number, self).__init__(int(value))
 
     def __eq__(self, other):
         return self.value == other.value
+
+
+class Array(Literal):
+    pass
 
 
 class String(Literal):
