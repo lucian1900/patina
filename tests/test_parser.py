@@ -18,7 +18,7 @@ def test_fields():
 
 
 def test_block():
-    assert parse('{}') == Block(None)
+    #assert parse('{}') == Block(None)
     assert parse('{ 1 }') == Block(Number(1))
 
 
@@ -26,6 +26,18 @@ def test_let():
     assert parse('let a: int = 1') == Let(Id('a'), Id('int'), Number('1'))
 
 
-# def test_if():
-#     assert parse('if 1 { 2 } else { 3 }') == If(
-#         Number(1), Block(Number(2)), Block(Number(3)))
+def test_fn():
+    assert parse('fn add(a: int, b: int) -> int { a }') == Fn(
+        Id('add'),
+        FieldList(
+            Field(Id('a'), Id('int')),
+            Field(Id('b'), Id('int')),
+        ),
+        Id('int'),
+        Block(Id('a')),
+    )
+
+
+def test_if():
+    assert parse('if 1 { 2 } else { 3 }') == If(
+        Number(1), Block(Number(2)), Block(Number(3)))

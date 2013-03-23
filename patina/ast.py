@@ -39,6 +39,9 @@ class Id(Node):
     def __init__(self, name):
         self.name = name
 
+    def __repr__(self):
+        return 'Id({0})'.format(self.name)
+
 
 class Field(Node):
     def __init__(self, name, type):
@@ -83,6 +86,12 @@ class If(Expr):
         self.condition = condition
         self.then = condition
         self.otherwise = otherwise
+
+
+class Call(Expr):
+    def __init__(self, fn, arguments):
+        self.fn = fn
+        self.arguments = arguments
 
 
 class BinOp(Expr):

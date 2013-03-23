@@ -6,6 +6,7 @@ lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
 
 # Literals
 lg.add('NUMBER',   r'\d+')
+lg.add('QUOTE',    r'\"')
 
 # Types
 lg.add('RETURNS',  r'->')

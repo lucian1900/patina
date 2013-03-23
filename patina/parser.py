@@ -25,7 +25,6 @@ def applied(f):
 @pg.production('main : expr')
 @pg.production('main : stmt')
 @pg.production('main : decl')
-@pg.production('main : fieldlist')
 def main(p):
     return p[0]
 
@@ -68,17 +67,7 @@ def stmt(p):
     return Statement(expr)
 
 
-@pg.production('maybe_expr :')
-def maybe_expr_none(p):
-    pass
-
-
-@pg.production('maybe_expr : expr')
-def maybe_expr_some(p):
-    return p[0]
-
-
-@pg.production('block : LBRACE maybe_expr RBRACE')
+@pg.production('block : LBRACE expr RBRACE')
 def block(p):
     _, exprs, _ = p
     return Block(exprs)
@@ -134,10 +123,27 @@ def literal(p):
     return Number(p[0].getstr())
 
 
-@pg.production('expr : LBRACKET expr RBRACKET')
+@pg.production('exprlist : expr')
+@pg.production('exprlist : exprlist COMMA expr')
+def exprlist(p):
+    if len(p) == 1:
+        return p
+    else:
+        elist, _, expr
+        return elist + [expr]
+
+
+# Array
+@pg.production('expr : LBRACKET exprlist RBRACKET')
 def array(p):
-    _, expr, _ = p
-    return Array(expr)
+    return Array(p[1])
+
+
+# Call
+@pg.production('expr : id LPAREN exprlist RPAREN')
+def call(p):
+    fn, _, args, _ = p
+    return Call(fn, args)
 
 
 # Operators
