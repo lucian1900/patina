@@ -31,3 +31,7 @@ def test_struct():
     assert values(lex('struct { a: int }')) == [
         'struct', '{', 'a', ':', 'int', '}'
     ]
+
+
+def test_let():
+    assert values(lex('let a: int = 1')) == ['let', 'a', ':', 'int', '=', '1']

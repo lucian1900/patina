@@ -1,6 +1,10 @@
 class Node(object):
     def __eq__(self, other):
-        return self.value == other.value
+        return (self.__class__ == other.__class__ and
+                self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self == other
 
 
 class Expr(Node):
@@ -8,13 +12,46 @@ class Expr(Node):
         self.value = value
 
 
+class Block(Node):
+    def __init__(self, exprs):
+        self.exprs = exprs
+
+
 class Literal(Expr):
+    def __init__(self, value):
+        self.value = value
+
+
+class Id(Expr):
     pass
+    #def __eq__(self, other):
+    #    return self.value == other.value
 
 
 class Number(Literal):
     def __init__(self, value):
-        self.value = int(value)
+        super(Number, self).__init__(int(value))
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+
+class String(Literal):
+    pass
+
+
+class Let(Expr):
+    def __init__(self, name, type, expr):
+        self.name = name
+        self.type = type
+        self.expr = expr
+
+
+class If(Expr):
+    def __init__(self, condition, then, otherwise):
+        self.condition = condition
+        self.then = condition
+        self.otherwise = otherwise
 
 
 class BinOp(Expr):

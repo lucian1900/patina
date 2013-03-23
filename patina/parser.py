@@ -20,7 +20,7 @@ def main(p):
 
 @pg.production('expr : ID')
 def identifier(p):
-    pass
+    return Id(p[0].getstr())
 
 
 # Literals
@@ -31,9 +31,27 @@ def literal(p):
 
 @pg.production('expr : LPAREN expr RPAREN')
 @pg.production('expr : LBRACKET expr RBRACKET')
-@pg.production('expr : LBRACE expr RBRACE')
 def group(p):
-    return p[1]
+    left, expr, right = p
+    return expr
+
+
+@pg.production('expr : LBRACE expr RBRACE')
+def block(p):
+    _, exprs, _ = p
+    return Block(exprs)
+
+
+@pg.production('expr : LET ID COLON ID ASSIGN expr')
+def let(p):
+    _, name, _, type, _, _, expr = p
+    return Let(name, type, expr)
+
+
+@pg.production('expr : IF expr LBRACE expr RBRACE ELSE LBRACE expr RBRACE')
+def if_(p):
+    _, condition, _, then, _, _, _, otherwise, _ = p
+    return If(condition, then, otherwise)
 
 
 # Operators
@@ -41,17 +59,26 @@ def group(p):
 @pg.production('expr : expr PLUS expr')
 @pg.production('expr : expr MINUS expr')
 def binop(p):
+    left, op, right = p
     binop_map = {
         'PLUS': Plus,
         'MINUS': Minus,
         'EQUALS': Equals,
     }
-    token_type = p[1].gettokentype()
-    return binop_map[token_type](p[0], p[2])
+    op_type = op.gettokentype()
+    return binop_map[op_type](left, right)
 
 
-def minus(p):
-    return Minus(p[0], p[2])
+@pg.error
+def error_handler(token):
+    source_pos = token.getsourcepos()
+    raise ValueError(
+        "Line {line}, col {col}: Got {type} when not expected".format(
+            line=source_pos.lineno,
+            col=source_pos.colno,
+            type=token.gettokentype(),
+        )
+    )
 
 
 parser = pg.build()

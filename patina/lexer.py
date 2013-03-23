@@ -25,18 +25,19 @@ lg.add('STRUCT',   r'struct')
 lg.add('FN',       r'fn')
 lg.add('LET',      r'let')
 lg.add('IF',       r'if')
+lg.add('ELSE',     r'else')
 
 # Operators
 lg.add('PLUS',     r'\+')
 lg.add('MINUS',    r'-')
 lg.add('EQUALS',   r'==')
+lg.add('ASSIGN',   r'=')
 
 lg.ignore(r' ')
 lg.ignore(r'\t')
 lg.ignore(r'\#.*')
 
 lexer = lg.build()
-#lex = lexer.lex
 
 
 def lex(text):
