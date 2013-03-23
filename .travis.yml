@@ -11,7 +11,7 @@ matrix:
 install:
     - pip install pytest
 
-script: py.test
+script: PYTHONPATH="." py.test
 
 notifications:
     email: false

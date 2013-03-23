@@ -1,5 +1,5 @@
 from os.path import join, dirname
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 with open(join(dirname(__file__), 'requirements.txt')) as f:
@@ -10,7 +10,7 @@ setup(
     name='patina',
     version='0.1',
     description='Not quite rust',
-    packages=find_packages(),
+    packages=['patina'],
     include_package_data=True,
     entry_points={
         'console_scripts': [
