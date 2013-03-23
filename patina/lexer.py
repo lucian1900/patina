@@ -12,6 +12,7 @@ lg.add('RETURNS',  r'->')
 lg.add('COLON',    r':')
 
 lg.add('SEMI',     r';')
+lg.add('COMMA',    r',')
 
 # Grouping
 lg.add('LPAREN',   r'\(')

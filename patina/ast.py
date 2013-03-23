@@ -12,23 +12,43 @@ class Expr(Node):
         self.value = value
 
 
-class Group(Expr):
-    pass
-
-
 class Statement(Expr):
     pass
 
 
-class Block(Node):
+class Block(Expr):
     def __init__(self, exprs):
         self.exprs = exprs
 
 
-class Id(Expr):
-    pass
-    #def __eq__(self, other):
-    #    return self.value == other.value
+class Struct(Statement):
+    def __init__(self, name, fields):
+        self.name = name
+        self.fields = fields
+
+
+class Fn(Statement):
+    def __init__(self, name, arguments, returns, block):
+        self.name = name
+        self.arguments = arguments
+        self.returns = returns
+        self.block = block
+
+
+class Id(Node):
+    def __init__(self, name):
+        self.name = name
+
+
+class Field(Node):
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
+
+
+class FieldList(Node):
+    def __init__(self, fields):
+        self.fields = fields
 
 
 class Literal(Expr):
@@ -53,9 +73,8 @@ class String(Literal):
 
 
 class Let(Expr):
-    def __init__(self, name, type, expr):
-        self.name = name
-        self.type = type
+    def __init__(self, field, expr):
+        self.field = field
         self.expr = expr
 
 

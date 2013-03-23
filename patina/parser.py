@@ -8,7 +8,10 @@ from patina.ast import *
 
 pg = ParserGenerator(
     [rule.name for rule in lexer.rules],
-    precedence=[],
+    precedence=[
+        ('left', ['PLUS', 'MINUS']),
+        ('left', 'EQUALS'),
+    ],
     cache_id='patina',
 )
 
@@ -20,20 +23,43 @@ def applied(f):
 
 
 @pg.production('main : expr')
+@pg.production('main : stmt')
+@pg.production('main : decl')
+@pg.production('main : fieldlist')
 def main(p):
-    # p is a list, of each of the pieces on the right hand side of the
-    # grammar rule
     return p[0]
 
 
-@pg.production('empty :')
-def empty(p):
-    pass
-
-
-@pg.production('expr : ID')
+@pg.production('id : ID')
 def identifier(p):
     return Id(p[0].getstr())
+
+
+@pg.production('field : id COLON id')
+def field(p):
+    name, _, type = p
+    return Field(name, type)
+
+
+@pg.production('fieldlist : field')
+@pg.production('fieldlist : fieldlist COMMA field')
+def fieldlist(p):
+    if len(p) == 1:
+        return FieldList(p)
+    else:
+        flist, _, field = p
+        return FieldList(flist.fields + [field])
+
+
+@pg.production('expr : id')
+def identifier_expr(p):
+    return p[0]
+
+
+@pg.production('expr : LPAREN expr RPAREN')
+def group(p):
+    _, expr, _ = p
+    return expr
 
 
 @pg.production('stmt : expr SEMI')
@@ -42,28 +68,64 @@ def stmt(p):
     return Statement(expr)
 
 
-@pg.production('expr : LBRACE stmt expr RBRACE')
+@pg.production('maybe_expr :')
+def maybe_expr_none(p):
+    pass
+
+
+@pg.production('maybe_expr : expr')
+def maybe_expr_some(p):
+    return p[0]
+
+
+@pg.production('block : LBRACE maybe_expr RBRACE')
 def block(p):
     _, exprs, _ = p
     return Block(exprs)
 
 
-@pg.production('expr : LPAREN expr RPAREN')
-def group(p):
-    _, expr, _ = p
-    return Group(expr)
+@pg.production('expr : block')
+def block_expr(p):
+    return p[0]
 
 
-@pg.production('expr : LET ID COLON ID ASSIGN expr')
+@pg.production('let : LET field ASSIGN expr')
 def let(p):
-    _, name, _, type, _, _, expr = p
-    return Let(name, type, expr)
+    _,  field, _, expr = p
+    return Let(field, expr)
 
 
-@pg.production('expr : IF expr LBRACE expr RBRACE ELSE LBRACE expr RBRACE')
+@pg.production('expr : let')
+def let_expr(p):
+    return p[0]
+
+
+@pg.production('expr : IF expr block ELSE block')
 def if_(p):
     _, condition, _, then, _, _, _, otherwise, _ = p
     return If(condition, then, otherwise)
+
+
+@pg.production('struct : STRUCT id LBRACE fieldlist RBRACE')
+def struct(p):
+    _, name, _, fields, _ = p
+    return Struct(name, fields)
+
+
+@pg.production('decl : struct')
+def struct_stmt(p):
+    return p[0]
+
+
+@pg.production('fn : FN id LPAREN fieldlist RPAREN RETURNS id block')
+def fn(p):
+    _, name, _, fields, _, _, returns, block = p
+    return Fn(name, fields, returns, block)
+
+
+@pg.production('decl : fn')
+def fn_stmt(p):
+    return p[0]
 
 
 # Literals
