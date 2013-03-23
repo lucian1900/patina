@@ -1,4 +1,3 @@
-from ply.lex import *
 from patina.lexer import lex
 
 
