@@ -89,8 +89,14 @@ def let_expr(p):
     return p[0]
 
 
-@pg.production('expr : IF expr block ELSE block')
+@pg.production('expr : IF expr block')
 def if_(p):
+    _, condition, then = p
+    return If(condition, then, None)
+
+
+@pg.production('expr : IF expr block ELSE block')
+def if_else(p):
     _, condition, _, then, _, _, _, otherwise, _ = p
     return If(condition, then, otherwise)
 
