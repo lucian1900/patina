@@ -26,6 +26,11 @@ def main(p):
     return p[0]
 
 
+@pg.production('empty :')
+def empty(p):
+    pass
+
+
 @pg.production('expr : ID')
 def identifier(p):
     return Id(p[0].getstr())
