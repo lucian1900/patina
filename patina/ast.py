@@ -18,7 +18,7 @@ class Type(Node):
     def __init__(self, name):
         self.name = name
 
-    def compile(self):
+    def compile(self, ctx):
         return self.name
 
 
@@ -31,8 +31,8 @@ class Expr(Node):
 
 
 class Stmt(Expr):
-    def compile(self):
-        return self.value.compile() + '; '
+    def compile(self, ctx):
+        return self.value.compile(ctx) + '; '
 
 
 class Block(Expr):
@@ -40,8 +40,8 @@ class Block(Expr):
         self.stmts = stmts
         self.expr = expr
 
-    def compile(self):
-        return '{' + ''.join(i.compile() for i in self.stmts) + '}'
+    def compile(self, ctx):
+        return '{' + ''.join(i.compile(ctx) for i in self.stmts) + '}'
 
     @property
     def type(self):
@@ -53,7 +53,7 @@ class Struct(Stmt):
         self.name = name
         self.fields = fields
 
-    def compile(self):
+    def compile(self, ctx):
         return
 
 
@@ -64,12 +64,12 @@ class Fn(Stmt):
         self.returns = returns
         self.block = block
 
-    def compile(self):
+    def compile(self, ctx):
         return '{returns} {name}({args}) {block}'.format(
-            name=self.name.compile(),
-            returns=self.returns.compile() if self.returns else 'void',
-            block=self.block.compile(),
-            args=self.args.compile()
+            name=self.name.compile(ctx),
+            returns=self.returns.compile(ctx) if self.returns else 'void',
+            block=self.block.compile(ctx),
+            args=self.args.compile(ctx)
         )
 
 
@@ -77,7 +77,7 @@ class Id(Expr):
     def __init__(self, name):
         self.name = name
 
-    def compile(self):
+    def compile(self, ctx):
         return self.name
 
 
@@ -86,16 +86,16 @@ class Field(Node):
         self.name = name
         self.type = type
 
-    def compile(self):
-        return self.name.compile() + ' ' + self.type.compile()
+    def compile(self, ctx):
+        return self.name.compile(ctx) + ' ' + self.type.compile(ctx)
 
 
 class FieldList(Node):
     def __init__(self, fields):
         self.fields = fields
 
-    def compile(self):
-        return ', '.join(i.compile() for i in self.fields)
+    def compile(self, ctx):
+        return ', '.join(i.compile(ctx) for i in self.fields)
 
 
 class Literal(Expr):
@@ -112,7 +112,7 @@ class Number(Literal):
     def __eq__(self, other):
         return self.value == other.value
 
-    def compile(self):
+    def compile(self, ctx):
         return str(self.value)
 
 
@@ -146,11 +146,11 @@ class If(Expr):
         self.then = then
         self.otherwise = otherwise
 
-    def compile(self):
+    def compile(self, ctx):
         return '{cond} ? {then} : {other}'.format(
-            cond=self.condition.compile(),
-            then=self.then.compile(),
-            other=self.otherwise.compile(),
+            cond=self.condition.compile(ctx),
+            then=self.then.compile(ctx),
+            other=self.otherwise.compile(ctx),
         )
 
 
@@ -159,11 +159,11 @@ class Call(Expr):
         self.fn = fn
         self.arguments = arguments
 
-    def compile(self):
+    def compile(self, ctx):
         if self.fn.name == 'print':
             return 'printf("%d", {0})'.format(self.arguments[0].value)
 
-        return self.fn.name.compile() + '(' + self.arguments.compile() + ')'
+        return self.fn.name.compile(ctx) + '(' + self.arguments.compile(ctx) + ')'
 
     @property
     def type(self):
@@ -171,6 +171,6 @@ class Call(Expr):
 
 
 class Ns(Node):
-    def __init__(self):
-        self.fns = {}
-        self.types = {}
+    def __init__(self, types, fns):
+        self.types = types
+        self.fns = fns

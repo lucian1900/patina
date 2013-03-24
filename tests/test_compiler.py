@@ -1,4 +1,5 @@
 from patina.ast import *
+from patina.compiler import CompilerContext
 
 
 def test_simple():
@@ -8,7 +9,7 @@ def test_simple():
         Id('int'),
         Block([], None),
     )
-    assert fn.compile() == 'int main() {}'
+    assert fn.compile(CompilerContext()) == 'int main() {}'
 
 
 def test_hello():
@@ -20,4 +21,4 @@ def test_hello():
             Stmt(Call(Id('print'), [Number(1)])),
         ], None),
     )
-    assert fn.compile() == 'int main() {printf("%d", 1); }'
+    assert fn.compile(CompilerContext()) == 'int main() {printf("%d", 1); }'
