@@ -20,7 +20,7 @@ def main():
 
     try:
         ast = parse(code)
-    except ValueError, e:
+    except ValueError as e:
         print('Syntax error: ' + e.message)
         return
 

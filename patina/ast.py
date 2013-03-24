@@ -43,6 +43,10 @@ class Block(Expr):
     def compile(self):
         return '{' + ''.join(i.compile() for i in self.stmts) + '}'
 
+    @property
+    def type(self):
+        return self.expr.type if self.expr else None
+
 
 class Struct(Stmt):
     def __init__(self, name, fields):
@@ -73,9 +77,6 @@ class Id(Expr):
     def __init__(self, name):
         self.name = name
 
-    def __repr__(self):
-        return 'Id({0})'.format(self.name)
-
     def compile(self):
         return self.name
 
@@ -103,7 +104,7 @@ class Literal(Expr):
 
 
 class Number(Literal):
-    type = Id('int')
+    type = Type('int')
 
     def __init__(self, value):
         super(Number, self).__init__(int(value))

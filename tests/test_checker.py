@@ -5,4 +5,4 @@ from patina.parser import parse
 def test_simple():
     let = parse('let a = 1')
 
-    assert let.type == Id('int')
+    assert let.type == Type('int')
