@@ -34,10 +34,9 @@ def identifier(p):
     return Id(p[0].getstr())
 
 
-@pg.production('type : COLON id')
+@pg.production('type : COLON ID')
 def type_(p):
-    _, id = p
-    return id
+    return Type(p[1].getstr())
 
 
 @pg.production('type :')
@@ -239,18 +238,19 @@ def binop(p):
 
 
 class SyntaxError(Exception):
-    pass
+    def __init__(self, message, lineno, colno):
+        self.message = message
+        self.lineno = lineno
+        self.colno = colno
 
 
 @pg.error
 def error_handler(token):
     source_pos = token.getsourcepos()
     raise SyntaxError(
-        "Line {line}, col {col}: Got {type} when not expected".format(
-            line=source_pos.lineno,
-            col=source_pos.colno,
-            type=token.gettokentype(),
-        )
+        "Got {0} when not expected".format(token.gettokentype()),
+        source_pos.lineno,
+        source_pos.colno,
     )
 
 

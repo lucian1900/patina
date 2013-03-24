@@ -23,7 +23,7 @@ def test_block():
 def test_let():
     assert parse('let a = 1') == Let(Field(Id('a'), None), Number(1))
     assert parse('let a: int = 1') == Let(
-        Field(Id('a'), Id('int')),
+        Field(Id('a'), Type('int')),
         Number('1'),
     )
 
@@ -35,7 +35,7 @@ def test_fn():
 
     assert parse('fn foo(a: int) {}') == Fn(
         Id('foo'),
-        FieldList([Field(Id('a'), Id('int'))]),
+        FieldList([Field(Id('a'), Type('int'))]),
         None,
         Block([], None),
     )
@@ -43,8 +43,8 @@ def test_fn():
     assert parse('fn add(a: int, b: int) -> int { a }') == Fn(
         Id('add'),
         FieldList([
-            Field(Id('a'), Id('int')),
-            Field(Id('b'), Id('int')),
+            Field(Id('a'), Type('int')),
+            Field(Id('b'), Type('int')),
         ]),
         Id('int'),
         Block([], Id('a')),

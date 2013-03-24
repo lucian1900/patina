@@ -10,6 +10,8 @@ def test_simple():
     )
     assert fn.compile() == 'int main() {}'
 
+
+def test_hello():
     fn = Fn(
         Id('main'),
         FieldList([]),

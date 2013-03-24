@@ -74,11 +74,17 @@ class Id(Expr):
     def __repr__(self):
         return 'Id({0})'.format(self.name)
 
+    def compile(self):
+        return self.name.name
+
 
 class Field(Node):
     def __init__(self, name, type):
         self.name = name
         self.type = type
+
+    def compile(self):
+        return self.name.compile() + ' ' + self.type.compile()
 
 
 class FieldList(Node):
@@ -116,18 +122,27 @@ class Let(Expr):
 
     @property
     def type(self):
-        if self.field.type is None:
-            if self.expr.type:
-                return self.expr.type
-            else:
-                raise InferenceError("Can't infer type for " + repr(self))
+        if self.field.type is not None:
+            return self.field.type
+
+        if self.expr.type:
+            return self.expr.type
+
+        raise InferenceError("Can't infer type for " + repr(self))
 
 
 class If(Expr):
     def __init__(self, condition, then, otherwise):
         self.condition = condition
-        self.then = condition
+        self.then = then
         self.otherwise = otherwise
+
+    def compile(self):
+        return '{cond} ? {then} : {other}'.format(
+            cond=self.condition.compile(),
+            then=self.then.compile(),
+            other=self.otherwise.compile(),
+        )
 
 
 class Call(Expr):
@@ -137,7 +152,7 @@ class Call(Expr):
 
     def compile(self):
         if self.fn.name == 'print':
-            return '''printf("%d", {0})'''.format(self.arguments[0].value)
+            return 'printf("%d", {0})'.format(self.arguments[0].value)
 
     @property
     def type(self):
@@ -164,3 +179,9 @@ class Minus(BinOp):
 
 class Equals(BinOp):
     pass
+
+
+class Ns(Node):
+    def __init__(self):
+        self.fns = {}
+        self.types = {}
