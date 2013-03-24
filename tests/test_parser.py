@@ -29,6 +29,17 @@ def test_let():
 
 
 def test_fn():
+    assert parse('fn foo() {}') == Fn(
+        Id('foo'), FieldList([]), None, Block([], None),
+    )
+
+    assert parse('fn foo(a: int) {}') == Fn(
+        Id('foo'),
+        FieldList([Field(Id('a'), Id('int'))]),
+        None,
+        Block([], None),
+    )
+
     assert parse('fn add(a: int, b: int) -> int { a }') == Fn(
         Id('add'),
         FieldList([

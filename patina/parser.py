@@ -34,21 +34,46 @@ def identifier(p):
     return Id(p[0].getstr())
 
 
-@pg.production('field : id COLON id')
+@pg.production('type : COLON id')
+def type_(p):
+    _, id = p
+    return id
+
+
+@pg.production('type :')
+def type_empty(p):
+    pass
+
+
+@pg.production('opttype :')
+def opttype_empty(p):
+    pass
+
+
+@pg.production('opttype : type')
+def opttype(p):
+    return p[0]
+
+
+@pg.production('field : id type')
 def field_typed(p):
-    name, _, type = p
+    name, type = p
     return Field(name, type)
 
 
-@pg.production('field : id')
-def field_inferred(p):
-    return Field(p[0], None)
+@pg.production('inferredfield : id opttype')
+def inferred_field_typed(p):
+    name, type = p
+    return Field(name, type)
 
 
+@pg.production('fieldlist :')
 @pg.production('fieldlist : field')
 @pg.production('fieldlist : fieldlist COMMA field')
 def fieldlist(p):
-    if len(p) == 1:
+    if len(p) == 0:
+        return FieldList([])
+    elif len(p) == 1:
         return FieldList(p)
     else:
         flist, _, field = p
@@ -110,7 +135,7 @@ def block_expr(p):
     return p[0]
 
 
-@pg.production('let : LET field ASSIGN expr')
+@pg.production('let : LET inferredfield ASSIGN expr')
 def let(p):
     _,  field, _, expr = p
     return Let(field, expr)
@@ -145,9 +170,15 @@ def struct_stmt(p):
 
 
 @pg.production('fn : FN id LPAREN fieldlist RPAREN RETURNS id block')
-def fn(p):
+def fn_returns(p):
     _, name, _, fields, _, _, returns, block = p
     return Fn(name, fields, returns, block)
+
+
+@pg.production('fn : FN id LPAREN fieldlist RPAREN block')
+def fn(p):
+    _, name, _, fields, _, block = p
+    return Fn(name, fields, None, block)
 
 
 @pg.production('decl : fn')

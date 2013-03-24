@@ -1,4 +1,7 @@
-class Node(object):
+from patina.utils import FieldReprer
+
+
+class Node(FieldReprer):
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
                 self.__dict__ == other.__dict__)
@@ -6,14 +9,10 @@ class Node(object):
     def __ne__(self, other):
         return not self == other
 
-    def __repr__(self):
-        ast_fields = [
-            str(k) + '=' + repr(v)
-            for k, v in self.__dict__.iteritems()
-            if '_' not in k and not hasattr(v, '__call__')
-        ]
 
-        return self.__class__.__name__ + '(' + ', '.join(ast_fields) + ')'
+class Type(Node):
+    def __init__(self, name):
+        self.name = name
 
 
 class Expr(Node):
@@ -46,8 +45,9 @@ class Fn(Stmt):
 
 
 class Id(Node):
-    def __init__(self, name):
+    def __init__(self, name, type=None):
         self.name = name
+        self.type = type
 
     def __repr__(self):
         return 'Id({0})'.format(self.name)
