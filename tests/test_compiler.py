@@ -1,5 +1,8 @@
+from pytest import raises
+
 from patina.ast import *
 from patina.compiler import compile
+from patina.parser import parse
 
 
 def test_simple():
@@ -22,3 +25,15 @@ def test_hello():
         ], None),
     )
     assert compile(fn) == 'int main() {printf("%d", 1); }'
+
+
+def test_missing():
+    ns = parse('''
+    fn foo() {
+        bar()
+    }
+    fn baz() {}
+    ''')
+
+    with raises(ReferenceError):
+        print(compile(ns))

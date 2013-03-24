@@ -1,7 +1,12 @@
 from patina.utils import FieldReprer
+from patina.compiler import CompilerContext
 
 
 class InferenceError(Exception):
+    pass
+
+
+class ReferenceError(Exception):
     pass
 
 
@@ -41,7 +46,11 @@ class Block(Expr):
         self.expr = expr
 
     def compile(self, ctx):
-        return '{' + ''.join(i.compile(ctx) for i in self.stmts) + '}'
+        stmts = list(self.stmts)
+        if self.expr:
+            stmts.append(self.expr)
+
+        return '{' + ''.join(i.compile(ctx) for i in stmts) + '}'
 
     @property
     def type(self):
@@ -82,6 +91,9 @@ class Id(Expr):
 
     def compile(self, ctx):
         return self.name
+
+    def __hash__(self):
+        return hash(self.name)
 
 
 class Field(Node):
@@ -132,7 +144,7 @@ class Let(Expr):
         if self.expr.type:
             return self.expr.type
 
-        raise InferenceError("Can't infer type for " + repr(self))
+        raise InferenceError("Can't infer type for '{0}'".format(repr(self)))
 
 
 class If(Expr):
@@ -158,6 +170,10 @@ class Call(Expr):
         if self.fn.name == 'print':
             return 'printf("%d", {0})'.format(self.arguments[0].value)
 
+        fn = ctx.fns.get(self.fn)
+        if fn is None:
+            raise ReferenceError("Cannot find fn '{0}'".format(self.fn.name))
+
         return self.fn.name.compile(ctx) + '(' + \
             self.arguments.compile(ctx) + ')'
 
@@ -171,5 +187,17 @@ class Ns(Node):
         self.decls = decls
 
     def compile(self, ctx):
-        return '\n'.join(i.compile(ctx) for i in self.types) + '\n' + \
-            '\n'.join(i.compile(ctx) for i in self.fns)
+        ctx = self.make_context()
+
+        return '\n'.join(i.compile(ctx) for i in self.decls)
+
+    def make_context(self):
+        ctx = CompilerContext()
+
+        for decl in self.decls:
+            if isinstance(decl, Fn):
+                ctx.fns[decl.name] = decl
+            elif isinstance(decl, Struct):
+                ctx.fns[decl.name] = decl
+
+        return ctx

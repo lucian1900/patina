@@ -9,7 +9,9 @@ class Code(str):
 
 
 class CompilerContext(object):
-    pass
+    def __init__(self):
+        self.types = {}
+        self.fns = {}
 
 
 def compile(ast):
