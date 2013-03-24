@@ -6,8 +6,8 @@ def values(tokens):
 
 
 def test_simple():
-    assert values(lex('(1 + 2)')) == ['(', '1', '+', '2', ')']
-    assert values(lex('1 == 2')) == ['1', '==', '2']
+    assert values(lex('1')) == ['1']
+    assert values(lex('add(1, 2)')) == ['add', '(', '1', ',', '2', ')']
 
 
 def test_empty():
@@ -25,9 +25,9 @@ def test_fn():
     assert values(lex('fn hello() -> int {}')) == [
         'fn', 'hello', '(', ')', '->', 'int', '{', '}',
     ]
-    assert values(lex('fn hello(a: int) -> int { a == 1 }')) == [
+    assert values(lex('fn hello(a: int) -> int { add(a, 1) }')) == [
         'fn', 'hello', '(', 'a', ':', 'int', ')', '->', 'int',
-        '{', 'a', '==', '1', '}',
+        '{', 'add', '(', 'a', ',', '1', ')', '}',
     ]
 
 

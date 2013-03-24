@@ -4,9 +4,7 @@ from patina.ast import *
 
 def test_simple():
     assert parse('1') == Number(1)
-    assert parse('1 + 2') == Plus(Number(1), Number(2))
     assert parse('hello') == Id('hello')
-    assert parse('1 + x') == Plus(Number(1), Id('x'))
     assert parse('1;') == Stmt(Number(1))
 
 
@@ -54,6 +52,8 @@ def test_fn():
 def test_call():
     assert parse('print()') == Call(Id('print'), [])
     assert parse('print(1)') == Call(Id('print'), [Number(1)])
+    assert parse('add(1, 2)') == Call(Id('add'), [Number(1), Number(2)])
+    assert parse('add(1, x)') == Call(Id('add'), [Number(1), Id('x')])
 
 
 def test_array():

@@ -1,5 +1,4 @@
 from patina.utils import FieldReprer
-from patina.compiler import Code
 
 
 class InferenceError(Exception):
@@ -18,6 +17,9 @@ class Node(FieldReprer):
 class Type(Node):
     def __init__(self, name):
         self.name = name
+
+    def compile(self):
+        return self.name
 
 
 class Expr(Node):
@@ -39,13 +41,16 @@ class Block(Expr):
         self.expr = expr
 
     def compile(self):
-        return Code('{' + ''.join(s.compile() for s in self.stmts) + '}')
+        return '{' + ''.join(i.compile() for i in self.stmts) + '}'
 
 
 class Struct(Stmt):
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
+
+    def compile(self):
+        return
 
 
 class Fn(Stmt):
@@ -56,15 +61,12 @@ class Fn(Stmt):
         self.block = block
 
     def compile(self):
-        return Code('{returns} {name}({args}) {block}'.format(
-            name=self.name.name,
-            returns=self.returns.name if self.returns else 'void',
+        return '{returns} {name}({args}) {block}'.format(
+            name=self.name.compile(),
+            returns=self.returns.compile() if self.returns else 'void',
             block=self.block.compile(),
-            args=', '.join(
-                '{0} {1}'.format(field.type, field.name)
-                for field in self.args.fields
-            )
-        ))
+            args=self.args.compile()
+        )
 
 
 class Id(Expr):
@@ -75,7 +77,7 @@ class Id(Expr):
         return 'Id({0})'.format(self.name)
 
     def compile(self):
-        return self.name.name
+        return self.name
 
 
 class Field(Node):
@@ -91,6 +93,9 @@ class FieldList(Node):
     def __init__(self, fields):
         self.fields = fields
 
+    def compile(self):
+        return ', '.join(i.compile() for i in self.fields)
+
 
 class Literal(Expr):
     def __init__(self, value):
@@ -105,6 +110,9 @@ class Number(Literal):
 
     def __eq__(self, other):
         return self.value == other.value
+
+    def compile(self):
+        return str(self.value)
 
 
 class Array(Literal):
@@ -154,31 +162,11 @@ class Call(Expr):
         if self.fn.name == 'print':
             return 'printf("%d", {0})'.format(self.arguments[0].value)
 
+        return self.fn.name.compile() + '(' + self.arguments.compile() + ')'
+
     @property
     def type(self):
         return self.fn.returns
-
-
-class BinOp(Expr):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    @property
-    def value(self):
-        return (self.left, self.right)
-
-
-class Plus(BinOp):
-    pass
-
-
-class Minus(BinOp):
-    pass
-
-
-class Equals(BinOp):
-    pass
 
 
 class Ns(Node):

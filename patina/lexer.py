@@ -6,6 +6,7 @@ lg = LexerGenerator()
 lg.add('STRUCT',   r'struct')
 lg.add('FN',       r'fn')
 lg.add('LET',      r'let')
+lg.add('ASSIGN',   r'=')
 lg.add('IF',       r'if')
 lg.add('ELSE',     r'else')
 
@@ -31,11 +32,6 @@ lg.add('RBRACKET', r'\]')
 lg.add('LBRACE',   r'\{')
 lg.add('RBRACE',   r'\}')
 
-# Operators
-lg.add('PLUS',     r'\+')
-lg.add('MINUS',    r'-')
-lg.add('EQUALS',   r'==')
-lg.add('ASSIGN',   r'=')
 
 lg.ignore(r' ')
 lg.ignore(r'\n')

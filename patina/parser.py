@@ -222,21 +222,6 @@ def call(p):
     return Call(fn, args)
 
 
-# Operators
-@pg.production('expr : expr EQUALS expr')
-@pg.production('expr : expr PLUS expr')
-@pg.production('expr : expr MINUS expr')
-def binop(p):
-    left, op, right = p
-    binop_map = {
-        'PLUS': Plus,
-        'MINUS': Minus,
-        'EQUALS': Equals,
-    }
-    op_type = op.gettokentype()
-    return binop_map[op_type](left, right)
-
-
 class SyntaxError(Exception):
     def __init__(self, message, lineno, colno):
         self.message = message
