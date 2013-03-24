@@ -1,6 +1,14 @@
 from rply import LexerGenerator
 
 lg = LexerGenerator()
+
+# Keywords
+lg.add('STRUCT',   r'struct')
+lg.add('FN',       r'fn')
+lg.add('LET',      r'let')
+lg.add('IF',       r'if')
+lg.add('ELSE',     r'else')
+
 # Identifiers
 lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
 
@@ -22,14 +30,6 @@ lg.add('LBRACKET', r'\[')
 lg.add('RBRACKET', r'\]')
 lg.add('LBRACE',   r'\{')
 lg.add('RBRACE',   r'\}')
-
-
-# Keywords
-lg.add('STRUCT',   r'struct')
-lg.add('FN',       r'fn')
-lg.add('LET',      r'let')
-lg.add('IF',       r'if')
-lg.add('ELSE',     r'else')
 
 # Operators
 lg.add('PLUS',     r'\+')

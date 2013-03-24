@@ -35,9 +35,14 @@ def identifier(p):
 
 
 @pg.production('field : id COLON id')
-def field(p):
+def field_typed(p):
     name, _, type = p
     return Field(name, type)
+
+
+@pg.production('field : id')
+def field_inferred(p):
+    return Field(p[0], None)
 
 
 @pg.production('fieldlist : field')
@@ -97,7 +102,7 @@ def if_(p):
 
 @pg.production('expr : IF expr block ELSE block')
 def if_else(p):
-    _, condition, _, then, _, _, _, otherwise, _ = p
+    _, condition, then, _, otherwise = p
     return If(condition, then, otherwise)
 
 
