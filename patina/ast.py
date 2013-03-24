@@ -1,4 +1,5 @@
 from patina.utils import FieldReprer
+from patina.compiler import Code
 
 
 class Node(FieldReprer):
@@ -21,13 +22,17 @@ class Expr(Node):
 
 
 class Stmt(Expr):
-    pass
+    def compile(self):
+        return self.value.compile() + ';'
 
 
 class Block(Expr):
     def __init__(self, stmts, expr):
         self.stmts = stmts
         self.expr = expr
+
+    def compile(self):
+        return Code('{' + ''.join(s.compile() for s in self.stmts) + '}')
 
 
 class Struct(Stmt):
@@ -42,6 +47,17 @@ class Fn(Stmt):
         self.args = args
         self.returns = returns
         self.block = block
+
+    def compile(self):
+        return Code('{returns} {name}({args}) {block}'.format(
+            name=self.name.name,
+            returns=self.returns.name if self.returns else 'void',
+            block=self.block.compile(),
+            args=', '.join(
+                '{0} {1}'.format(field.type, field.name)
+                for field in self.args.fields
+            )
+        ))
 
 
 class Id(Node):
@@ -102,6 +118,10 @@ class Call(Expr):
     def __init__(self, fn, arguments):
         self.fn = fn
         self.arguments = arguments
+
+    def compile(self):
+        if self.fn.name == 'print':
+            return '''printf("%d", {0})'''.format(self.arguments[0].value)
 
 
 class BinOp(Expr):
