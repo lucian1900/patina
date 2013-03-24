@@ -36,4 +36,13 @@ def test_missing():
     ''')
 
     with raises(ReferenceError):
-        print(compile(ns))
+        compile(ns)
+
+    ns = parse('''
+    fn foo() {
+        bar()
+    }
+    fn bar() {}
+    ''')
+
+    assert compile(ns) == 'void foo() {bar()}\nvoid bar() {}'

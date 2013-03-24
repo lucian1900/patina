@@ -174,8 +174,8 @@ class Call(Expr):
         if fn is None:
             raise ReferenceError("Cannot find fn '{0}'".format(self.fn.name))
 
-        return self.fn.name.compile(ctx) + '(' + \
-            self.arguments.compile(ctx) + ')'
+        return self.fn.compile(ctx) + '(' + \
+            ', '.join(i.compile(ctx) for i in self.arguments) + ')'
 
     @property
     def type(self):
