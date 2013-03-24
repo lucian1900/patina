@@ -6,6 +6,15 @@ class Node(object):
     def __ne__(self, other):
         return not self == other
 
+    def __repr__(self):
+        ast_fields = [
+            str(k) + '=' + repr(v)
+            for k, v in self.__dict__.iteritems()
+            if '_' not in k and not hasattr(v, '__call__')
+        ]
+
+        return self.__class__.__name__ + '(' + ', '.join(ast_fields) + ')'
+
 
 class Expr(Node):
     def __init__(self, value):
@@ -17,8 +26,8 @@ class Stmt(Expr):
 
 
 class Block(Expr):
-    def __init__(self, statements, expr):
-        self.stmts = statements
+    def __init__(self, stmts, expr):
+        self.stmts = stmts
         self.expr = expr
 
 
@@ -29,9 +38,9 @@ class Struct(Stmt):
 
 
 class Fn(Stmt):
-    def __init__(self, name, arguments, returns, block):
+    def __init__(self, name, args, returns, block):
         self.name = name
-        self.arguments = arguments
+        self.args = args
         self.returns = returns
         self.block = block
 
