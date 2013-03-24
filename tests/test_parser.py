@@ -11,9 +11,9 @@ def test_simple():
 
 
 def test_block():
-    #assert parse('{}') == Block([], None)
-    #assert parse('{ 1 }') == Block([], Number(1))
-    #assert parse('{ 1; 2 }') == Block([Stmt(Number(1))], Number(2))
+    assert parse('{}') == Block([], None)
+    assert parse('{ 1 }') == Block([], Number(1))
+    assert parse('{ 1; 2 }') == Block([Stmt(Number(1))], Number(2))
     assert parse('{ 1; 2; }') == Block(
         [Stmt(Number(1)), Stmt(Number(2))],
         None,
