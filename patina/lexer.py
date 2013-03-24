@@ -14,7 +14,7 @@ lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
 
 # Literals
 lg.add('NUMBER',   r'\d+')
-lg.add('QUOTE',    r'\"')
+#lg.add('QUOTE',    r'\"')
 
 # Types
 lg.add('RETURNS',  r'->')
@@ -38,6 +38,7 @@ lg.add('EQUALS',   r'==')
 lg.add('ASSIGN',   r'=')
 
 lg.ignore(r' ')
+lg.ignore(r'\n')
 lg.ignore(r'\t')
 lg.ignore(r'\#.*')
 

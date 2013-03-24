@@ -10,6 +10,11 @@ def test_simple():
     assert values(lex('1 == 2')) == ['1', '==', '2']
 
 
+def test_empty():
+    assert values(lex('')) == []
+    assert values(lex('\n \n')) == []
+
+
 def test_fn():
     assert values(lex('fn hello() {}')) == [
         'fn', 'hello', '(', ')', '{', '}',

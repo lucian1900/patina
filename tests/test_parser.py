@@ -51,6 +51,17 @@ def test_fn():
     )
 
 
+def test_call():
+    assert parse('print()') == Call(Id('print'), [])
+    assert parse('print(1)') == Call(Id('print'), [Number(1)])
+
+
+def test_array():
+    assert parse('[]') == Array([])
+    assert parse('[1]') == Array([Number(1)])
+    assert parse('[1, 2]') == Array([Number(1), Number(2)])
+
+
 def test_if():
     assert parse('if 1 { 2 }') == If(Number(1), Block([], Number(2)), None)
     assert parse('if 1 { 2 } else { 3 }') == If(
@@ -60,9 +71,12 @@ def test_if():
     )
 
 
-# def test_hello():
-#     assert parse('''
-#     fn main() {
-#         print(1)
-#     }
-#     ''')
+def test_hello():
+    assert parse('fn main() { print(1); }') == Fn(
+        Id('main'),
+        FieldList([]),
+        None,
+        Block([Stmt(
+            Call(Id('print'), [Number(1)]),
+        )], None),
+    )

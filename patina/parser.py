@@ -192,20 +192,28 @@ def literal(p):
     return Number(p[0].getstr())
 
 
+@pg.production('exprlist :')
 @pg.production('exprlist : expr')
 @pg.production('exprlist : exprlist COMMA expr')
 def expr_list(p):
-    if len(p) == 1:
-        return p
+    if len(p) == 0:
+        return []
+    elif len(p) == 1:
+        expr = p[0]
+        if expr is None:
+            return []
+
+        return [expr]
     else:
-        elist, _, expr
+        elist, _, expr = p
         return elist + [expr]
 
 
 # Array
 @pg.production('expr : LBRACKET exprlist RBRACKET')
 def array(p):
-    return Array(p[1])
+    _, exprs, _ = p
+    return Array(exprs or [])
 
 
 # Call
