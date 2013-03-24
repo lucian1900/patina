@@ -10,13 +10,6 @@ lg.add('ASSIGN',   r'=')
 lg.add('IF',       r'if')
 lg.add('ELSE',     r'else')
 
-# Identifiers
-lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
-
-# Literals
-lg.add('NUMBER',   r'\d+')
-#lg.add('QUOTE',    r'\"')
-
 # Types
 lg.add('RETURNS',  r'->')
 lg.add('COLON',    r':')
@@ -32,6 +25,12 @@ lg.add('RBRACKET', r'\]')
 lg.add('LBRACE',   r'\{')
 lg.add('RBRACE',   r'\}')
 
+# Identifiers
+lg.add('ID',       r'[a-zA-Z_][a-zA-Z_0-9]*')
+
+# Literals
+lg.add('NUMBER',   r'\d+')
+#lg.add('QUOTE',    r'\"')
 
 lg.ignore(r' ')
 lg.ignore(r'\n')

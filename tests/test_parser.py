@@ -28,22 +28,22 @@ def test_let():
 
 def test_fn():
     assert parse('fn foo() {}') == Fn(
-        Id('foo'), FieldList([]), None, Block([], None),
+        Id('foo'), [], None, Block([], None),
     )
 
     assert parse('fn foo(a: int) {}') == Fn(
         Id('foo'),
-        FieldList([Field(Id('a'), Type('int'))]),
+        [Field(Id('a'), Type('int'))],
         None,
         Block([], None),
     )
 
     assert parse('fn add(a: int, b: int) -> int { a }') == Fn(
         Id('add'),
-        FieldList([
+        [
             Field(Id('a'), Type('int')),
             Field(Id('b'), Type('int')),
-        ]),
+        ],
         Id('int'),
         Block([], Id('a')),
     )
@@ -71,12 +71,29 @@ def test_if():
     )
 
 
+def test_struct():
+    assert parse('struct a {x: int}') == Struct(
+        Id('a'),
+        [Field(Id('x'), Type('int'))],
+    )
+
+
 def test_hello():
     assert parse('fn main() { print(1); }') == Fn(
         Id('main'),
-        FieldList([]),
+        [],
         None,
         Block([Stmt(
             Call(Id('print'), [Number(1)]),
         )], None),
     )
+
+
+def test_ns():
+    assert parse('''
+    struct foo {a : int}
+    fn main() {}
+    ''') == Ns([
+        Struct(Id('foo'), [Field(Id('a'), Type('int'))]),
+        Fn(Id('main'), [], None, Block([], None)),
+    ])

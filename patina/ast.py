@@ -54,7 +54,10 @@ class Struct(Stmt):
         self.fields = fields
 
     def compile(self, ctx):
-        return
+        return 'struct {name} {{ {fields} }}'.format(
+            name=self.name.compile(ctx),
+            fields=', '.join(i.compile(ctx) for i in self.fields),
+        )
 
 
 class Fn(Stmt):
@@ -69,7 +72,7 @@ class Fn(Stmt):
             name=self.name.compile(ctx),
             returns=self.returns.compile(ctx) if self.returns else 'void',
             block=self.block.compile(ctx),
-            args=self.args.compile(ctx)
+            args=', '.join(i.compile(ctx) for i in self.args),
         )
 
 
@@ -88,14 +91,6 @@ class Field(Node):
 
     def compile(self, ctx):
         return self.name.compile(ctx) + ' ' + self.type.compile(ctx)
-
-
-class FieldList(Node):
-    def __init__(self, fields):
-        self.fields = fields
-
-    def compile(self, ctx):
-        return ', '.join(i.compile(ctx) for i in self.fields)
 
 
 class Literal(Expr):
@@ -163,7 +158,8 @@ class Call(Expr):
         if self.fn.name == 'print':
             return 'printf("%d", {0})'.format(self.arguments[0].value)
 
-        return self.fn.name.compile(ctx) + '(' + self.arguments.compile(ctx) + ')'
+        return self.fn.name.compile(ctx) + '(' + \
+            self.arguments.compile(ctx) + ')'
 
     @property
     def type(self):
@@ -171,6 +167,9 @@ class Call(Expr):
 
 
 class Ns(Node):
-    def __init__(self, types, fns):
-        self.types = types
-        self.fns = fns
+    def __init__(self, decls):
+        self.decls = decls
+
+    def compile(self, ctx):
+        return '\n'.join(i.compile(ctx) for i in self.types) + '\n' + \
+            '\n'.join(i.compile(ctx) for i in self.fns)

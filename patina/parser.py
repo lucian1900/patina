@@ -25,6 +25,7 @@ def applied(f):
 @pg.production('main : expr')
 @pg.production('main : stmt')
 @pg.production('main : decl')
+@pg.production('main : ns')
 def main(p):
     return p[0]
 
@@ -66,17 +67,42 @@ def inferred_field_typed(p):
     return Field(name, type)
 
 
-@pg.production('fieldlist :')
+@pg.production('exprlist :')
+@pg.production('exprlist : expr')
+@pg.production('exprlist : exprlist COMMA expr')
+@pg.production('structlist :')
+@pg.production('structlist : struct')
+@pg.production('structlist : structlist SEMI struct')
+@pg.production('decllist :')
+@pg.production('decllist : decl')
+@pg.production('decllist : decllist decl')
+@pg.production('fnlist :')
+@pg.production('fnlist : fn')
+@pg.production('fnlist : fnlist SEMI fn')
+@pg.production('arglist :')
+@pg.production('arglist : field')
+@pg.production('arglist : arglist COMMA field')
 @pg.production('fieldlist : field')
 @pg.production('fieldlist : fieldlist COMMA field')
-def fieldlist(p):
+@pg.production('stmtlist : stmt')
+@pg.production('stmtlist : stmtlist stmt')
+def prodlist(p):
     if len(p) == 0:
-        return FieldList([])
+        return []
+
     elif len(p) == 1:
-        return FieldList(p)
+        i = p[0]
+        if i is None:
+            return []
+        return [i]
+
+    elif len(p) == 2:
+        lst, i = p
+        return lst + [i]
+
     else:
-        flist, _, field = p
-        return FieldList(flist.fields + [field])
+        lst, _, i = p
+        return lst + [i]
 
 
 @pg.production('expr : id')
@@ -94,16 +120,6 @@ def group(p):
 def stmt(p):
     expr, _ = p
     return Stmt(expr)
-
-
-@pg.production('stmtlist : stmt')
-@pg.production('stmtlist : stmtlist stmt')
-def stmt_list(p):
-    if len(p) == 1:
-        return p
-    else:
-        slist, stmt = p
-        return slist + [stmt]
 
 
 @pg.production('block :')
@@ -168,13 +184,13 @@ def struct_stmt(p):
     return p[0]
 
 
-@pg.production('fn : FN id LPAREN fieldlist RPAREN RETURNS id block')
+@pg.production('fn : FN id LPAREN arglist RPAREN RETURNS id block')
 def fn_returns(p):
     _, name, _, fields, _, _, returns, block = p
     return Fn(name, fields, returns, block)
 
 
-@pg.production('fn : FN id LPAREN fieldlist RPAREN block')
+@pg.production('fn : FN id LPAREN arglist RPAREN block')
 def fn(p):
     _, name, _, fields, _, block = p
     return Fn(name, fields, None, block)
@@ -191,23 +207,6 @@ def literal(p):
     return Number(p[0].getstr())
 
 
-@pg.production('exprlist :')
-@pg.production('exprlist : expr')
-@pg.production('exprlist : exprlist COMMA expr')
-def expr_list(p):
-    if len(p) == 0:
-        return []
-    elif len(p) == 1:
-        expr = p[0]
-        if expr is None:
-            return []
-
-        return [expr]
-    else:
-        elist, _, expr = p
-        return elist + [expr]
-
-
 # Array
 @pg.production('expr : LBRACKET exprlist RBRACKET')
 def array(p):
@@ -220,6 +219,11 @@ def array(p):
 def call(p):
     fn, _, args, _ = p
     return Call(fn, args)
+
+
+@pg.production('ns : decllist')
+def ns(p):
+    return Ns(p[0])
 
 
 class SyntaxError(Exception):
