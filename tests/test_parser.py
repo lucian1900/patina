@@ -11,15 +11,21 @@ def test_simple():
 
 
 def test_block():
-    assert parse('{}') == Block([], None)
-    assert parse('{ 1 }') == Block([], Number(1))
-    assert parse('{ 1; 2 }') == Block([Stmt(Number(1))], Number(2))
+    #assert parse('{}') == Block([], None)
+    #assert parse('{ 1 }') == Block([], Number(1))
+    #assert parse('{ 1; 2 }') == Block([Stmt(Number(1))], Number(2))
+    assert parse('{ 1; 2; }') == Block(
+        [Stmt(Number(1)), Stmt(Number(2))],
+        None,
+    )
 
 
 def test_let():
+    assert parse('let a = 1') == Let(Field(Id('a'), None), Number(1))
     assert parse('let a: int = 1') == Let(
         Field(Id('a'), Id('int')),
-        Number('1'))
+        Number('1'),
+    )
 
 
 def test_fn():
@@ -37,4 +43,15 @@ def test_fn():
 def test_if():
     assert parse('if 1 { 2 }') == If(Number(1), Block([], Number(2)), None)
     assert parse('if 1 { 2 } else { 3 }') == If(
-        Number(1), Block([], Number(2)), Block([], Number(3)))
+        Number(1),
+        Block([], Number(2)),
+        Block([], Number(3)),
+    )
+
+
+# def test_hello():
+#     assert parse('''
+#     fn main() {
+#         print(1)
+#     }
+#     ''')

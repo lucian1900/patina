@@ -79,7 +79,7 @@ def stmt_list(p):
         return p
     else:
         slist, stmt = p
-        return p + [stmt]
+        return slist + [stmt]
 
 
 @pg.production('block :')
@@ -97,6 +97,12 @@ def block_single(p):
 def block(p):
     _, stmts, expr, _ = p
     return Block(stmts, expr)
+
+
+@pg.production('block : LBRACE stmtlist RBRACE')
+def block_stmt(p):
+    _, stmts, _ = p
+    return Block(stmts, None)
 
 
 @pg.production('expr : block')
