@@ -12,22 +12,23 @@ class Expr(Node):
         self.value = value
 
 
-class Statement(Expr):
+class Stmt(Expr):
     pass
 
 
 class Block(Expr):
-    def __init__(self, exprs):
-        self.exprs = exprs
+    def __init__(self, statements, expr):
+        self.stmts = statements
+        self.expr = expr
 
 
-class Struct(Statement):
+class Struct(Stmt):
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
 
 
-class Fn(Statement):
+class Fn(Stmt):
     def __init__(self, name, arguments, returns, block):
         self.name = name
         self.arguments = arguments

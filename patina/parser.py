@@ -69,13 +69,34 @@ def group(p):
 @pg.production('stmt : expr SEMI')
 def stmt(p):
     expr, _ = p
-    return Statement(expr)
+    return Stmt(expr)
+
+
+@pg.production('stmtlist : stmt')
+@pg.production('stmtlist : stmtlist stmt')
+def stmt_list(p):
+    if len(p) == 1:
+        return p
+    else:
+        slist, stmt = p
+        return p + [stmt]
+
+
+@pg.production('block :')
+def block_empty(p):
+    pass
 
 
 @pg.production('block : LBRACE expr RBRACE')
+def block_single(p):
+    _, expr, _ = p
+    return Block([], expr)
+
+
+@pg.production('block : LBRACE stmtlist expr RBRACE')
 def block(p):
-    _, exprs, _ = p
-    return Block(exprs)
+    _, stmts, expr, _ = p
+    return Block(stmts, expr)
 
 
 @pg.production('expr : block')
@@ -136,7 +157,7 @@ def literal(p):
 
 @pg.production('exprlist : expr')
 @pg.production('exprlist : exprlist COMMA expr')
-def exprlist(p):
+def expr_list(p):
     if len(p) == 1:
         return p
     else:
