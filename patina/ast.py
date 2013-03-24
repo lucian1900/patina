@@ -2,6 +2,10 @@ from patina.utils import FieldReprer
 from patina.compiler import Code
 
 
+class InferenceError(Exception):
+    pass
+
+
 class Node(FieldReprer):
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
@@ -17,13 +21,16 @@ class Type(Node):
 
 
 class Expr(Node):
+    type = None
+
     def __init__(self, value):
         self.value = value
+        self.type = None
 
 
 class Stmt(Expr):
     def compile(self):
-        return self.value.compile() + ';'
+        return self.value.compile() + '; '
 
 
 class Block(Expr):
@@ -60,10 +67,9 @@ class Fn(Stmt):
         ))
 
 
-class Id(Node):
-    def __init__(self, name, type=None):
+class Id(Expr):
+    def __init__(self, name):
         self.name = name
-        self.type = type
 
     def __repr__(self):
         return 'Id({0})'.format(self.name)
@@ -86,6 +92,8 @@ class Literal(Expr):
 
 
 class Number(Literal):
+    type = Id('int')
+
     def __init__(self, value):
         super(Number, self).__init__(int(value))
 
@@ -106,6 +114,14 @@ class Let(Expr):
         self.field = field
         self.expr = expr
 
+    @property
+    def type(self):
+        if self.field.type is None:
+            if self.expr.type:
+                return self.expr.type
+            else:
+                raise InferenceError("Can't infer type for " + repr(self))
+
 
 class If(Expr):
     def __init__(self, condition, then, otherwise):
@@ -122,6 +138,10 @@ class Call(Expr):
     def compile(self):
         if self.fn.name == 'print':
             return '''printf("%d", {0})'''.format(self.arguments[0].value)
+
+    @property
+    def type(self):
+        return self.fn.returns
 
 
 class BinOp(Expr):

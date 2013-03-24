@@ -238,10 +238,14 @@ def binop(p):
     return binop_map[op_type](left, right)
 
 
+class SyntaxError(Exception):
+    pass
+
+
 @pg.error
 def error_handler(token):
     source_pos = token.getsourcepos()
-    raise ValueError(
+    raise SyntaxError(
         "Line {line}, col {col}: Got {type} when not expected".format(
             line=source_pos.lineno,
             col=source_pos.colno,

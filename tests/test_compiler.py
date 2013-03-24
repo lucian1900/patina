@@ -8,5 +8,14 @@ def test_simple():
         Id('int'),
         Block([], None),
     )
-
     assert fn.compile() == 'int main() {}'
+
+    fn = Fn(
+        Id('main'),
+        FieldList([]),
+        Id('int'),
+        Block([
+            Stmt(Call(Id('print'), [Number(1)])),
+        ], None),
+    )
+    assert fn.compile() == 'int main() {printf("%d", 1); }'
